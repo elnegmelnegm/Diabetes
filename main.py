@@ -1,38 +1,29 @@
 import streamlit as st
 from pathlib import Path
 from PIL import Image
-import pandas as pd
 
 import google.generativeai as genai
-
-import requests
-
-genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
 
 # Set page configuration
 st.set_page_config(
     page_title="Diabetes AI Assistant",
-    page_icon="icon.png",
+    #page_icon="icon.png",
     layout="wide",
 )
 
 # Display header
 st.markdown('''
-<img src="icon.png" width="250" height="100">
+#<img src="icon.png" width="250" height="100">
 ''', unsafe_allow_html=True)
 
 # Display powered by information
 st.markdown('''
-Powered by Google AI <img src="google_ai_logo.png" width="20" height="20"> Streamlit <img src="streamlit_logo.png" width="22" height="22"> Python <img src="python_logo.png" width="22" height="22">''', unsafe_allow_html=True)
+#Powered by Google AI <img src="google_ai_logo.png" width="20" height="20"> Streamlit <img src="streamlit_logo.png" width="22" height="22"> Python <img src="python_logo.png" width="22" height="22">''', unsafe_allow_html=True)
 
 # Language selection
 langcols = st.columns([0.2, 0.8])
 with langcols[0]:
     lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
-
-#genai.__version__
-
-
 
 # Set up the model
 generation_config = {
@@ -55,55 +46,15 @@ model = genai.GenerativeModel(
     safety_settings=safety_settings,
 )
 
-# Language selection
-langcols = st.columns([0.2, 0.8])
-with langcols[0]:
-    lang = st.selectbox("Select your language", ("English", "العربية"), index=1)
-
-# Update input prompt
-input_prompt = """
-               As an expert specializing in assessing the suitability of fruits and foods for individuals with diabetes, your task involves analyzing input images featuring various food items. Your first objective is to identify the type of fruit or food present in the image. Subsequently, you must determine the glycemic index of the identified item. Based on this glycemic index, provide recommendations on whether individuals with diabetes can include the detected food in their diet. If the food is deemed suitable, specify the recommended quantity for consumption. Use English and Arabic languages for response.
-               """
-
-
-def input_image_setup(file_loc):
-    if not (img := Path(file_loc)).exists():
-        raise FileNotFoundError(f"Could not find image: {img}")
-
-    image_parts = [
-        {"mime_type": "image/jpeg", "data": Path(file_loc).read_bytes()}
-    ]
-    return image_parts
-
-
-def generate_gemini_response(input_prompt, image_loc):
-    image_prompt = input_image_setup(image_loc)
-    prompt_parts = [input_prompt, image_prompt[0]]
-
-    # Generate response in English
-    response_en = model.generate_content(prompt_parts)
-
-    # Generate response in Arabic
-    response_ar = model.generate_content(prompt_parts, lang="ar")
-
-    return response_en.text, response_ar.text
-
-
-def upload_file(files):
-    file_paths = [file.name for file in files]
-    if file_paths:
-        response_en, response_ar = generate_gemini_response(
-            input_prompt, file_paths[0]
-        )
-    return file_paths[0], response_en, response_ar
-
-
-
-
-# Rest of the code remains unchanged
-# ...
+# Rest of the code
 # ...
 
-# Run the app
-st.run_app(debug=True)
+# File upload and response display
+uploaded_file, response_en, response_ar = upload_file(st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"]))
 
+# Display responses
+st.text("Uploaded File: " + uploaded_file)
+st.text("English Response:")
+st.write(response_en)
+st.text("Arabic Response:")
+st.write(response_ar)
