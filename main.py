@@ -11,7 +11,7 @@ import requests
 
 genai.__version__
 
-genai.configure(api_key="YOUR_API_KEY")
+genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
 
 # Set up the model
 generation_config = {
