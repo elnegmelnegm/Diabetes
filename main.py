@@ -37,12 +37,12 @@ input_prompt = """
                """
 
 # Function to handle file upload and model response
-def generate_gemini_response(input_prompt, image_loc, lang="en"):
+def generate_gemini_response(image_loc):
     image_prompt = input_image_setup(image_loc)
     prompt_parts = [input_prompt, image_prompt[0]]
 
-    # Generate response in the specified language
-    response = model.generate_content(prompt_parts, lang=lang)
+    # Generate response
+    response = model.generate_content(prompt_parts)
 
     return response.text
 
@@ -71,7 +71,7 @@ uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jp
 
 if uploaded_file:
     try:
-        response = generate_gemini_response(input_prompt, uploaded_file)
+        response = generate_gemini_response(uploaded_file)
         st.text("Uploaded File: " + uploaded_file.name)
         st.text("Generated Response:")
         st.write(response)
