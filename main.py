@@ -2,6 +2,21 @@ import streamlit as st
 from pathlib import Path
 from PIL import Image
 
+
+st.set_page_config(
+    page_title="ُEDA AI Chat",
+    page_icon="https://www.edaegypt.gov.eg/media/wc3lsydo/group-287.png",
+    layout="wide",
+)
+# Path: Main.py
+#Author: CADC Techenical Support Team
+#------------------------------------------------------------
+#HEADER
+st.markdown('''
+<img src="https://www.edaegypt.gov.eg/media/wc3lsydo/group-287.png" width="250" height="100">''', unsafe_allow_html=True)
+st.markdown('''
+Powered by Google AI <img src="https://seeklogo.com/images/G/google-ai-logo-996E85F6FD-seeklogo.com.png" width="20" height="20"> Streamlit <img src="https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/f/f0d0d26db1f2d99da8472951c60e5a1b782eb6fe.png" width="22" height="22"> Python <img src="https://png2.cleanpng.com/sh/38d322d41e2d6d5738e129190b8c33a7/L0KzQYq3VsI0N5Ruf5H0aYP2gLBuTgB6fJl0hp9sb33zhcXskr1qa5Dzi595cnBqgrL0jflvb15xedDwdXHqdX7smPVkfaVmRadtMHazcbKAg8c5bpM4RqI9MUS7Q4e4UcU3OWM7TqoANUi0R4W1kP5o/kisspng-python-computer-icons-programming-language-executa-5d0f0aa7c78fb3.0414836115612668558174.png" width="22" height="22">''', unsafe_allow_html=True)
+
 import google.generativeai as genai
 genai.configure(api_key=('AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o'))
 
