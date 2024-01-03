@@ -3,44 +3,47 @@ from pathlib import Path
 from PIL import Image
 
 import google.generativeai as genai
-genai.configure(api_key = ('AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o'))
+genai.configure(api_key=('AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o'))
 
 # Set up the model
 generation_config = {
-  "temperature": 0.4,
-  "top_p": 1,
-  "top_k": 32,
-  "max_output_tokens": 4096,
+    "temperature": 0.4,
+    "top_p": 1,
+    "top_k": 32,
+    "max_output_tokens": 4096,
 }
 
 safety_settings = [
-  {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  }
+    {
+        "category": "HARM_CATEGORY_HARASSMENT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    },
+    {
+        "category": "HARM_CATEGORY_HATE_SPEECH",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    },
+    {
+        "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    },
+    {
+        "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+        "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+    }
 ]
 
+model = genai.GenerativeModel(model_name="gemini-pro-vision",
+                              generation_config=generation_config,
+                              safety_settings=safety_settings)
 
-
-model = genai.GenerativeModel(model_name = "gemini-pro-vision",
-                              generation_config = generation_config,
-                              safety_settings = safety_settings)
+# Define input prompt globally
+input_prompt = """
+               As an expert specializing in assessing the suitability of fruits and foods for individuals with diabetes, your task involves analyzing input images featuring various food items. Your first objective is to identify the type of fruit or food present in the image. Subsequently, you must determine the glycemic index of the identified item. Based on this glycemic index, provide recommendations on whether individuals with diabetes can include the detected food in their diet. If the food is deemed suitable, specify the recommended quantity for consumption. Use English and Arabic languages for the response.
+               """
 
 
 # Function to handle file upload and model response
-def generate_gemini_response(input_prompt, image_loc):
+def generate_gemini_response(image_loc):
     image_prompt = input_image_setup(image_loc)
     prompt_parts = [input_prompt, image_prompt[0]]
 
@@ -60,8 +63,8 @@ def input_image_setup(file_loc):
         {
             "mime_type": "image/jpeg",
             "data": Path(file_loc).read_bytes()
-            }
-        ]
+        }
+    ]
     return image_parts
 
 def upload_file(file_uploader):
@@ -69,7 +72,7 @@ def upload_file(file_uploader):
 
     if uploaded_file:
         try:
-            response_en, response_ar = generate_gemini_response(input_prompt, uploaded_file)
+            response_en, response_ar = generate_gemini_response(uploaded_file)
             return uploaded_file.name, response_en, response_ar
         except Exception as e:
             return f"Error processing image: {e}", "", ""
@@ -106,3 +109,4 @@ if lang == 'English':
 else:
     st.text("الاستجابة الناتجة:")
     st.write(response_ar)
+
