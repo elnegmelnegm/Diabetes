@@ -9,9 +9,28 @@ import requests
 
 genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
 
+# Set page configuration
+st.set_page_config(
+    page_title="Diabetes AI Assistant",
+    page_icon="icon.png",
+    layout="wide",
+)
 
+# Display header
+st.markdown('''
+<img src="icon.png" width="250" height="100">
+''', unsafe_allow_html=True)
 
-genai.__version__
+# Display powered by information
+st.markdown('''
+Powered by Google AI <img src="google_ai_logo.png" width="20" height="20"> Streamlit <img src="streamlit_logo.png" width="22" height="22"> Python <img src="python_logo.png" width="22" height="22">''', unsafe_allow_html=True)
+
+# Language selection
+langcols = st.columns([0.2, 0.8])
+with langcols[0]:
+    lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
+
+#genai.__version__
 
 
 
@@ -79,26 +98,7 @@ def upload_file(files):
     return file_paths[0], response_en, response_ar
 
 
-# Set page configuration
-st.set_page_config(
-    page_title="Diabetes AI Assistant",
-    page_icon="icon.png",
-    layout="wide",
-)
 
-# Display header
-st.markdown('''
-<img src="icon.png" width="250" height="100">
-''', unsafe_allow_html=True)
-
-# Display powered by information
-st.markdown('''
-Powered by Google AI <img src="google_ai_logo.png" width="20" height="20"> Streamlit <img src="streamlit_logo.png" width="22" height="22"> Python <img src="python_logo.png" width="22" height="22">''', unsafe_allow_html=True)
-
-# Language selection
-langcols = st.columns([0.2, 0.8])
-with langcols[0]:
-    lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
 
 # Rest of the code remains unchanged
 # ...
