@@ -53,18 +53,6 @@ def input_image_setup(file_loc):
     ]
     return image_parts
 
-def upload_file(file_uploader):
-    uploaded_file = file_uploader("Upload an image of your food", type=["jpg", "jpeg", "png"])
-
-    if uploaded_file:
-        try:
-            response_en, response_ar = generate_gemini_response(uploaded_file)
-            return uploaded_file.name, response_en, response_ar
-        except Exception as e:
-            return f"Error processing image: {e}", "", ""
-    else:
-        return "", "", ""
-
 # Display header
 st.set_page_config(
     page_title="ُEDA AI Chat",
@@ -82,19 +70,18 @@ with langcols[0]:
     lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
 
 # File upload and response display
-try:
-    uploaded_file, response_en, response_ar = upload_file(st.file_uploader(label="Upload an image of your food", type=["jpg", "jpeg", "png"]))
-except Exception as e:
-    st.error(f"Error: {e}")
+uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jpg", "jpeg", "png"])
 
-# Display responses
-st.text("Uploaded File: " + uploaded_file)
+if uploaded_file:
+    try:
+        response_en, response_ar = generate_gemini_response(uploaded_file)
+        st.text("Uploaded File: " + uploaded_file.name)
 
-if lang == 'English':
-    st.text("Generated Response:")
-    st.write(response_en)
-else:
-    st.text("الاستجابة الناتجة:")
-    st.write(response_ar)
-
-
+        if lang == 'English':
+            st.text("Generated Response:")
+            st.write(response_en)
+        else:
+            st.text("الاستجابة الناتجة:")
+            st.write(response_ar)
+    except Exception as e:
+        st.error(f"Error processing image: {e}")
