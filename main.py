@@ -79,8 +79,8 @@ uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jp
 if uploaded_file:
     try:
         response = generate_gemini_response(uploaded_file)
-        st.text("Uploaded File: " + uploaded_file.name)
-        st.markdown("## Generated Response:")
-        st.write(response)
+        
+        
+        st.write(####response)
     except Exception as e:
         st.error(f"Error processing image: {e}")
