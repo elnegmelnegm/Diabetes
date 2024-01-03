@@ -3,27 +3,41 @@ from pathlib import Path
 from PIL import Image
 
 import google.generativeai as genai
+genai.configure(api_key = ('AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o'))
 
 # Set up the model
 generation_config = {
-    "temperature": 0.4,
-    "top_p": 1,
-    "top_k": 32,
-    "max_output_tokens": 4096,
+  "temperature": 0.4,
+  "top_p": 1,
+  "top_k": 32,
+  "max_output_tokens": 4096,
 }
 
 safety_settings = [
-    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+  {
+    "category": "HARM_CATEGORY_HARASSMENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_HATE_SPEECH",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  },
+  {
+    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
+  }
 ]
 
-model = genai.GenerativeModel(
-    model_name="gemini-pro-vision",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-)
+
+
+model = genai.GenerativeModel(model_name = "gemini-pro-vision",
+                              generation_config = generation_config,
+                              safety_settings = safety_settings)
+
 
 # Function to handle file upload and model response
 def generate_gemini_response(input_prompt, image_loc):
@@ -43,8 +57,11 @@ def input_image_setup(file_loc):
         raise FileNotFoundError(f"Could not find image: {img}")
 
     image_parts = [
-        {"mime_type": "image/jpeg", "data": Path(file_loc).read_bytes()}
-    ]
+        {
+            "mime_type": "image/jpeg",
+            "data": Path(file_loc).read_bytes()
+            }
+        ]
     return image_parts
 
 def upload_file(file_uploader):
@@ -59,12 +76,6 @@ def upload_file(file_uploader):
     else:
         return "", "", ""
 
-# Set page configuration
-st.set_page_config(
-    page_title="Diabetes AI Assistant",
-    page_icon="icon.png",
-    layout="wide",
-)
 
 # Display header
 st.markdown('''
