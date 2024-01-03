@@ -4,7 +4,7 @@ from PIL import Image
 import pandas as pd
 
 import google.generativeai as genai
-from google.colab import userdata
+
 import requests
 
 genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
