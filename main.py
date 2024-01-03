@@ -27,7 +27,6 @@ try:
         model_name="gemini-pro-vision",
         generation_config=generation_config,
         safety_settings=safety_settings,
-        lang="en"  # Set the default language to English
     )
 except Exception as e:
     st.error(f"Error initializing the model: {e}")
@@ -38,17 +37,14 @@ input_prompt = """
                """
 
 # Function to handle file upload and model response
-def generate_gemini_response(image_loc):
+def generate_gemini_response(input_prompt, image_loc, lang="en"):
     image_prompt = input_image_setup(image_loc)
     prompt_parts = [input_prompt, image_prompt[0]]
 
-    # Generate response in English
-    response_en = model.generate_content(prompt_parts)
+    # Generate response in the specified language
+    response = model.generate_content(prompt_parts, lang=lang)
 
-    # Generate response in Arabic
-    response_ar = model.generate_content(prompt_parts, lang="ar")
-
-    return response_en.text, response_ar.text
+    return response.text
 
 def input_image_setup(file_loc):
     if not (img := Path(file_loc)).exists():
@@ -75,14 +71,9 @@ uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jp
 
 if uploaded_file:
     try:
-        response_en, response_ar = generate_gemini_response(uploaded_file)
+        response = generate_gemini_response(input_prompt, uploaded_file)
         st.text("Uploaded File: " + uploaded_file.name)
-
-        if lang == 'English':
-            st.text("Generated Response:")
-            st.write(response_en)
-        else:
-            st.text("الاستجابة الناتجة:")
-            st.write(response_ar)
+        st.text("Generated Response:")
+        st.write(response)
     except Exception as e:
         st.error(f"Error processing image: {e}")
