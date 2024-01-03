@@ -1,7 +1,5 @@
 import streamlit as st
 from pathlib import Path
-from PIL import Image
-
 import google.generativeai as genai
 
 # Configure the API key
@@ -22,29 +20,16 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-try:
-    model = genai.GenerativeModel(
-        model_name="gemini-pro-vision",
-        generation_config=generation_config,
-        safety_settings=safety_settings,
-    )
-except Exception as e:
-    st.error(f"Error initializing the model: {e}")
+model = genai.GenerativeModel(
+    model_name="gemini-pro-vision",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 
 # Define input prompt globally
 input_prompt = """
                As an expert specializing in assessing the suitability of fruits and foods for individuals with diabetes, your task involves analyzing input images featuring various food items. Your first objective is to identify the type of fruit or food present in the image. Subsequently, you must determine the glycemic index of the identified item. Based on this glycemic index, provide recommendations on whether individuals with diabetes can include the detected food in their diet. If the food is deemed suitable, specify the recommended quantity for consumption. Use English and Arabic languages for the response.
                """
-
-# Function to handle file upload and model response
-def generate_gemini_response(image_loc):
-    image_prompt = input_image_setup(image_loc)
-    prompt_parts = [input_prompt, image_prompt[0]]
-
-    # Generate response
-    response = model.generate_content(prompt_parts)
-
-    return response.text
 
 def input_image_setup(file_loc):
     if not (img := Path(file_loc)).exists():
@@ -54,6 +39,18 @@ def input_image_setup(file_loc):
         {"mime_type": "image/jpeg", "data": Path(file_loc).read_bytes()}
     ]
     return image_parts
+
+def generate_gemini_response(image_loc):
+    image_prompt = input_image_setup(image_loc)
+    prompt_parts = [input_prompt, image_prompt[0]]
+
+    # Generate response
+    try:
+        response = model.generate_content(prompt_parts)
+        return response.text
+    except Exception as e:
+        st.error(f"Error generating response: {e}")
+        return None
 
 # Display header
 st.set_page_config(
@@ -71,9 +68,9 @@ uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jp
 
 if uploaded_file:
     try:
-        response = generate_gemini_response(uploaded_file)
+        response_text = generate_gemini_response(uploaded_file)
         st.text("Uploaded File: " + uploaded_file.name)
         st.text("Generated Response:")
-        st.write(response)
+        st.write(response_text)
     except Exception as e:
         st.error(f"Error processing image: {e}")
