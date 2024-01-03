@@ -47,6 +47,18 @@ def input_image_setup(file_loc):
     ]
     return image_parts
 
+def upload_file(file_uploader):
+    uploaded_file = file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    
+    if uploaded_file:
+        try:
+            response_en, response_ar = generate_gemini_response(input_prompt, uploaded_file)
+            return uploaded_file.name, response_en, response_ar
+        except Exception as e:
+            return f"Error processing image: {e}", "", ""
+    else:
+        return "", "", ""
+
 # Set page configuration
 st.set_page_config(
     page_title="Diabetes AI Assistant",
@@ -80,4 +92,3 @@ st.text("English Response:")
 st.write(response_en)
 st.text("Arabic Response:")
 st.write(response_ar)
-
