@@ -65,8 +65,8 @@ def input_image_setup(file_loc):
     return image_parts
 
 def upload_file(file_uploader):
-    uploaded_file = file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
-    
+    uploaded_file = file_uploader("Upload an image of your food", type=["jpg", "jpeg", "png"])
+
     if uploaded_file:
         try:
             response_en, response_ar = generate_gemini_response(input_prompt, uploaded_file)
@@ -99,7 +99,10 @@ except Exception as e:
 
 # Display responses
 st.text("Uploaded File: " + uploaded_file)
-st.text("English Response:")
-st.write(response_en)
-st.text("Arabic Response:")
-st.write(response_ar)
+
+if lang == 'English':
+    st.text("Generated Response:")
+    st.write(response_en)
+else:
+    st.text("الاستجابة الناتجة:")
+    st.write(response_ar)
