@@ -3,6 +3,8 @@ from pathlib import Path
 from PIL import Image
 
 import google.generativeai as genai
+
+# Configure the API key
 genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
 
 # Set up the model
@@ -20,12 +22,15 @@ safety_settings = [
     {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-model = genai.GenerativeModel(
-    model_name="gemini-pro-vision",
-    generation_config=generation_config,
-    safety_settings=safety_settings,
-    lang="en"  # Set the default language to English
-)
+try:
+    model = genai.GenerativeModel(
+        model_name="gemini-pro-vision",
+        generation_config=generation_config,
+        safety_settings=safety_settings,
+        lang="en"  # Set the default language to English
+    )
+except Exception as e:
+    st.error(f"Error initializing the model: {e}")
 
 # Define input prompt globally
 input_prompt = """
@@ -37,17 +42,20 @@ def generate_gemini_response(image_loc):
     image_prompt = input_image_setup(image_loc)
     prompt_parts = [input_prompt, image_prompt[0]]
 
-    # Generate response
-    response = model.generate_content(prompt_parts)
+    # Generate response in English
+    response_en = model.generate_content(prompt_parts)
 
-    return response.text
+    # Generate response in Arabic
+    response_ar = model.generate_content(prompt_parts, lang="ar")
 
-def input_image_setup(uploaded_file):
-    # Convert the uploaded file to bytes
-    image_bytes = uploaded_file.read()
+    return response_en.text, response_ar.text
+
+def input_image_setup(file_loc):
+    if not (img := Path(file_loc)).exists():
+        raise FileNotFoundError(f"Could not find image: {img}")
 
     image_parts = [
-        {"mime_type": "image/jpeg", "data": image_bytes}
+        {"mime_type": "image/jpeg", "data": Path(file_loc).read_bytes()}
     ]
     return image_parts
 
@@ -62,24 +70,19 @@ st.markdown('''
 st.markdown('''
 Powered by Google AI <img src="https://seeklogo.com/images/G/google-ai-logo-996E85F6FD-seeklogo.com.png" width="20" height="20"> Streamlit <img src="https://global.discourse-cdn.com/business7/uploads/streamlit/original/2X/f/f0d0d26db1f2d99da8472951c60e5a1b782eb6fe.png" width="22" height="22"> Python <img src="https://png2.cleanpng.com/sh/38d322d41e2d6d5738e129190b8c33a7/L0KzQYq3VsI0N5Ruf5H0aYP2gLBuTgB6fJl0hp9sb33zhcXskr1qa5Dzi595cnBqgrL0jflvb15xedDwdXHqdX7smPVkfaVmRadtMHazcbKAg8c5bpM4RqI9MUS7Q4e4UcU3OWM7TqoANUi0R4W1kP5o/kisspng-python-computer-icons-programming-language-executa-5d0f0aa7c78fb3.0414836115612668558174.png" width="22" height="22">''', unsafe_allow_html=True)
 
-# Language selection
-langcols = st.columns([0.2, 0.8])
-with langcols[0]:
-    lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
-
 # File upload and response display
 uploaded_file = st.file_uploader(label="Upload an image of your food", type=["jpg", "jpeg", "png"])
 
 if uploaded_file:
     try:
-        response = generate_gemini_response(uploaded_file)
+        response_en, response_ar = generate_gemini_response(uploaded_file)
         st.text("Uploaded File: " + uploaded_file.name)
 
         if lang == 'English':
             st.text("Generated Response:")
-            st.write(response)
+            st.write(response_en)
         else:
             st.text("الاستجابة الناتجة:")
-            st.write(response)
+            st.write(response_ar)
     except Exception as e:
         st.error(f"Error processing image: {e}")
