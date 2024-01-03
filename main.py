@@ -69,7 +69,10 @@ with langcols[0]:
     lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
 
 # File upload and response display
-uploaded_file, response_en, response_ar = upload_file(st.file_uploader)
+try:
+    uploaded_file, response_en, response_ar = upload_file(st.file_uploader)
+except Exception as e:
+    st.error(f"Error: {e}")
 
 # Display responses
 st.text("Uploaded File: " + uploaded_file)
@@ -77,3 +80,4 @@ st.text("English Response:")
 st.write(response_en)
 st.text("Arabic Response:")
 st.write(response_ar)
+
