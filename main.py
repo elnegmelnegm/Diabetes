@@ -2,52 +2,44 @@ import streamlit as st
 from pathlib import Path
 from PIL import Image
 import pandas as pd
-from gradio import Interface
 
 import google.generativeai as genai
 from google.colab import userdata
-from PIL import Image
 import requests
-
-genai.__version__
 
 genai.configure(api_key="AIzaSyCFPALEVIiwvWSREvVdBOzNd1VeyqQWt9o")
 
+
+
+genai.__version__
+
+genai.configure(api_key="YOUR_API_KEY")
+
 # Set up the model
 generation_config = {
-  "temperature": 0.4,
-  "top_p": 1,
-  "top_k": 32,
-  "max_output_tokens": 4096,
+    "temperature": 0.4,
+    "top_p": 1,
+    "top_k": 32,
+    "max_output_tokens": 4096,
 }
 
 safety_settings = [
-  {
-    "category": "HARM_CATEGORY_HARASSMENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_HATE_SPEECH",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  },
-  {
-    "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
-    "threshold": "BLOCK_MEDIUM_AND_ABOVE"
-  }
+    {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+    {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
 ]
 
-model = genai.GenerativeModel(model_name="gemini-pro-vision",
-                              generation_config=generation_config,
-                              safety_settings=safety_settings)
+model = genai.GenerativeModel(
+    model_name="gemini-pro-vision",
+    generation_config=generation_config,
+    safety_settings=safety_settings,
+)
 
 # Language selection
 langcols = st.columns([0.2, 0.8])
 with langcols[0]:
-    lang = st.selectbox('Select your language', ('English', 'العربية'), index=1)
+    lang = st.selectbox("Select your language", ("English", "العربية"), index=1)
 
 # Update input prompt
 input_prompt = """
@@ -60,10 +52,7 @@ def input_image_setup(file_loc):
         raise FileNotFoundError(f"Could not find image: {img}")
 
     image_parts = [
-        {
-            "mime_type": "image/jpeg",
-            "data": Path(file_loc).read_bytes()
-        }
+        {"mime_type": "image/jpeg", "data": Path(file_loc).read_bytes()}
     ]
     return image_parts
 
@@ -84,18 +73,11 @@ def generate_gemini_response(input_prompt, image_loc):
 def upload_file(files):
     file_paths = [file.name for file in files]
     if file_paths:
-        response_en, response_ar = generate_gemini_response(input_prompt, file_paths[0])
+        response_en, response_ar = generate_gemini_response(
+            input_prompt, file_paths[0]
+        )
     return file_paths[0], response_en, response_ar
 
-
-with Interface() as demo:
-    file_output = gr.Textbox()
-    image_output = gr.Image()
-    combined_output = [image_output, file_output]
-    upload_button = gr.UploadButton("Click to Upload an Image of the Food that you want to eat",
-                                    file_types=["image"],
-                                    file_count="multiple")
-    upload_button.upload(upload_file, upload_button, combined_output)
 
 # Set page configuration
 st.set_page_config(
@@ -124,3 +106,4 @@ with langcols[0]:
 
 # Run the app
 st.run_app(debug=True)
+
